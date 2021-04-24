@@ -1,0 +1,65 @@
+general:
+  re:
+    ru: ""
+    en: ""
+  content: []
+
+contacts:
+  re:
+    ru: "Контакты"
+    en: "Контакты"
+  content: []
+
+#position:
+#  re:
+#    ru: "NONE"
+#    en: "NONE"
+#  content: []
+
+experience:
+  re:
+    ru: "^Опыт работы.*"
+    en: "^Work experience.*"
+  content: []
+
+skills:
+  re:
+    ru: "Ключевые навыки"
+    en: "Key skills"
+  content: []
+
+about:
+  re:
+    ru: "Обо мне"
+    en: "About me"
+  content: []
+
+recommendation:
+  re:
+    ru: "Рекомендации"
+    en: ""
+  content: []
+
+education:
+  re:
+    ru: "^Высшее образование.*"
+    en: "^Higher education.*"
+  content: []
+
+languages:
+  re:
+    ru: "Знание языков"
+    en: "Languages"
+  content: []
+
+training:
+  re:
+    ru: "Повышение квалификации, курсы"
+    en: ""
+  content: []
+
+citizenship:
+  re:
+    ru: "Гражданство, время в пути до работы"
+    en: "Citizenship, travel time to work"
+  content: []
