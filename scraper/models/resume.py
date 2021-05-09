@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, AnyUrl
 
 
 class Title(BaseModel):
@@ -11,7 +11,7 @@ class Title(BaseModel):
 
 class Section(BaseModel):
     title: Title
-    raw: List[str]
+    raw: List[str] = []
 
     @classmethod
     def re(cls, lang: str) -> Optional[str]:
@@ -33,6 +33,7 @@ class Contacts(Section):
     title = Title(ru="Контакты", en="Контакты")
     phones: List[Optional[str]]
     emails: List[Optional[EmailStr]]
+    links: List[Optional[AnyUrl]]
     city: Optional[str]
     other: str
 
@@ -41,6 +42,7 @@ class Position(Section):
     title = Title(searchable=False)
     title: str
     salary: Optional[str]
+    other: Optional[str]
 
 
 class Experience(Section):
@@ -68,7 +70,7 @@ class About(Section):
 
 
 class Recommendation(Section):
-    title = Title(searchable=False)
+    title = Title(ru="Рекомендации", en="")
     text: str
 
 

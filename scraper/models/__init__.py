@@ -14,14 +14,17 @@ from .resume import Resume
 
 
 all_sections = {
-    "general": {"model": General, "raw": []},
-    "contacts": {"model": Contacts, "raw": []},
-    "position": {"model": Position, "raw": []},
-    "experience": {"model": Experience, "raw": []},
-    "skills": {"model": Skills, "raw": []},
-    "about": {"model": About, "raw": []},
-    "recommendation": {"model": Recommendation, "raw": []},
-    "education": {"model": Education, "raw": []},
-    "languages": {"model": Languages, "raw": []},
-    "citizenship": {"model": Citizenship, "raw": []},
+    section: getattr(Resume, section)
+    for section in [
+        "general",
+        "contacts",
+        "position",
+        "experience",
+        "skills",
+        "about",
+        "recommendation",
+        "education",
+        "languages",
+        "citizenship",
+    ]
 }
