@@ -1,5 +1,4 @@
 from typing import List, Optional
-from datetime import datetime
 from pydantic import BaseModel, EmailStr, AnyUrl
 
 
@@ -11,7 +10,7 @@ class Title(BaseModel):
 
 class Section(BaseModel):
     title: Title
-    raw: List[str] = []
+    other: Optional[str]
 
     @classmethod
     def re(cls, lang: str) -> Optional[str]:
@@ -25,7 +24,7 @@ class General(Section):
     title = Title()
     name: str
     gender: Optional[str]
-    birthday: Optional[datetime]
+    birthday: Optional[str]
     age: Optional[int]
 
 
@@ -35,14 +34,12 @@ class Contacts(Section):
     emails: List[Optional[EmailStr]]
     links: List[Optional[AnyUrl]]
     city: Optional[str]
-    other: str
 
 
 class Position(Section):
-    title = Title(searchable=False)
+    title = Title(ru="Резюме обновлено", en="Resume updated")
     title: str
     salary: Optional[str]
-    other: Optional[str]
 
 
 class Experience(Section):
@@ -98,10 +95,9 @@ class Citizenship(Section):
     title = Title(ru="Гражданство, время в пути до работы", en="Citizenship, travel time to work")
     citizenship: str
     permission: Optional[str]
-    other: Optional[str]
 
 
-class Resume(Section):
+class Resume(BaseModel):
     general = General
     contacts = Contacts
     position = Position
