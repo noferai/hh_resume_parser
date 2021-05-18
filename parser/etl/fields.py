@@ -60,16 +60,23 @@ class FieldsExtractor:
                     birthday += f".{year.group()}"
         return birthday
 
-    # def extract_email(self, text: str) -> typing.Optional[str]:
-    #     email = re.findall(r"([^@|\s]+@[^@]+\.[^@|\s]+)", text)
-    #     if email:
-    #         try:
-    #             return email[0].split()[0].strip(";")
-    #         except IndexError:
-    #             return
-    #
-    # def extract_phone(self, text: str) -> typing.Optional[str]:
-    #     pass
+    @staticmethod
+    def extract_email(text: str) -> typing.Optional[str]:
+        if email := re.findall(r"([^@|\s]+@[^@]+\.[^@|\s]+)", text):
+            return email[0]
+        return
+
+    @staticmethod
+    def extract_phone(text: str) -> typing.Optional[str]:
+        if phone := re.findall(r"\+?\d{1,3}\s?\s?\(?\d{3}\)?\s?\d{3}[\s.-]\d{2}[\s.-]\d{2}", text):
+            return phone[0]
+        return
+
+    @staticmethod
+    def extract_link(text: str) -> typing.Optional[str]:
+        if link := re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", text):
+            return link[0]
+        return
 
     def extract(self, field_name: str, text: str):
         try:

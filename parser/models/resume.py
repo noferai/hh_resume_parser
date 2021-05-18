@@ -33,13 +33,14 @@ class Contacts(Section):
     phones: List[Optional[str]]
     emails: List[Optional[EmailStr]]
     links: List[Optional[AnyUrl]]
-    city: Optional[str]
+    other: Optional[str]
 
 
 class Position(Section):
     title = Title(ru="Резюме обновлено", en="Resume updated")
     title: str
     salary: Optional[str]
+    updated: str
 
 
 class Experience(Section):

@@ -57,7 +57,14 @@ class ResumeETL:
         return section
 
     def get_contacts(self, raw: list) -> models.Contacts:
-        pass
+        section = models.Contacts(
+            emails=[i for p in raw if (i := self.fields.extract("email", p))],
+            phones=[i for p in raw if (i := self.fields.extract("phone", p))],
+            links=[i for p in raw if (i := self.fields.extract("link", p))],
+            other=raw[-1],
+        )
+
+        return section
 
     def get_position(self, raw: list) -> models.Position:
         pass
