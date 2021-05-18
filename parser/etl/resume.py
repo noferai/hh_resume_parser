@@ -1,12 +1,10 @@
 import re
-import logging
 
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
+from parser.config import logger
 from .fields import FieldsExtractor
-
-logger = logging.getLogger(__name__)
 
 
 class ResumeETL:
@@ -88,7 +86,7 @@ class ResumeETL:
     def get_section(self, attr_name: str, data: list):
         try:
             getter = getattr(self, f"get_{attr_name}")
-            getter(data)
+            return getter(data)
         except AttributeError:
             logger.error(f"No getter method for <{attr_name}> attribute found")
 
@@ -96,4 +94,4 @@ class ResumeETL:
         for name, content in self.sections.items():
             raw = content.get("raw")
             if section := self.get_section(name, raw):
-                logger.info(section)
+                logger.info(section.dict())

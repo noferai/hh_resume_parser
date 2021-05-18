@@ -1,6 +1,7 @@
 import re
-import logging
 import typing
+
+from parser.config import logger
 
 
 months = [
@@ -21,9 +22,6 @@ months = [
 genders = {"ru": ["Мужчина", "Женщина"], "en": ["Male", "Female"]}
 years_old = {"ru": ["год", "лет"], "en": ["years old"]}
 born_on = {"ru": ["родился", "родилась"], "en": ["born on"]}
-
-
-logger = logging.getLogger(__name__)
 
 
 class FieldsExtractor:
@@ -76,6 +74,6 @@ class FieldsExtractor:
     def extract(self, field_name: str, text: str):
         try:
             getter = getattr(self, f"extract_{field_name}")
-            getter(text)
+            return getter(text)
         except AttributeError:
             logger.error(f"No extract_ method for <{field_name}> field found")
