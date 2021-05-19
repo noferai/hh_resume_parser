@@ -1,3 +1,4 @@
 googletrans
 lxml
 pydantic[email]
+funcy

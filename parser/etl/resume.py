@@ -40,7 +40,7 @@ class ResumeETL:
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):
             while not re.match(self.sections[r_sec]["title"], p):
                 try:
-                    self.sections[l_sec]["raw"].append(p)
+                    self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
                     p = next(p_iter)
                 except StopIteration:
                     break
@@ -63,23 +63,37 @@ class ResumeETL:
             links=[i for p in raw if (i := self.fields.extract("link", p))],
             other=raw[-1],
         )
-
         return section
 
     def get_position(self, raw: list) -> models.Position:
-        pass
+        section = models.Position(
+            updated=self.fields.extract("updated", raw.pop(0)),
+            name=raw.pop(0),
+            salary=raw.pop(0),
+            other="\n".join(raw),
+        )
+        return section
 
     def get_experience(self, raw: list) -> models.Experience:
-        pass
+        section = models.Experience(
+            total=self.fields.extract("experience.total", raw.pop(0)),
+            items=self.fields.extract("experience.items", raw),
+        )
+        return section
 
-    def get_skills(self, raw: list) -> models.Skills:
-        pass
+    @staticmethod
+    def get_skills(raw: list) -> models.Skills:
+        section = models.Skills(items=raw[1:])
+        return section
 
-    def get_about(self, raw: list) -> models.About:
-        pass
+    @staticmethod
+    def get_about(raw: list) -> models.About:
+        section = models.About(text="\n".join(raw[1:]))
+        return section
 
-    def get_recommendation(self, raw: list) -> models.Recommendation:
-        pass
+    def get_recommendations(self, raw: list) -> models.Recommendations:
+        section = models.Recommendations(items=self.fields.extract("recommendations.items", raw[1:]))
+        return section
 
     def get_education(self, raw: list) -> models.Education:
         pass

@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, AnyUrl
 
 
@@ -33,20 +34,22 @@ class Contacts(Section):
     phones: List[Optional[str]]
     emails: List[Optional[EmailStr]]
     links: List[Optional[AnyUrl]]
-    other: Optional[str]
 
 
 class Position(Section):
     title = Title(ru="Резюме обновлено", en="Resume updated")
-    title: str
+    name: str
     salary: Optional[str]
-    updated: str
+    updated: datetime
 
 
 class Experience(Section):
     class Item(BaseModel):
         duration: str
+        total: str
         company: str
+        company_info: str
+        position: str
         other: str
 
     title = Title(ru="Опыт работы", en="Work experience")
@@ -55,11 +58,8 @@ class Experience(Section):
 
 
 class Skills(Section):
-    class Item(BaseModel):
-        name: str
-
     title = Title(ru="Ключевые навыки", en="Key skills")
-    items: List[Item]
+    items: List[str]
 
 
 class About(Section):
@@ -67,9 +67,13 @@ class About(Section):
     text: str
 
 
-class Recommendation(Section):
+class Recommendations(Section):
+    class Item(BaseModel):
+        org: str
+        person: str
+
     title = Title(ru="Рекомендации", en="")
-    text: str
+    items: List[Item]
 
 
 class Education(Section):
@@ -105,7 +109,7 @@ class Resume(BaseModel):
     experience = Experience
     skills = Skills
     about = About
-    recommendation = Recommendation
+    recommendations = Recommendations
     education = Education
     languages = Languages
     # training:

@@ -1,6 +1,10 @@
 import re
 import typing
+from datetime import datetime
 
+from funcy.seqs import chunks
+
+from parser.models import Experience, Recommendations
 from parser.config import logger
 
 
@@ -20,7 +24,7 @@ months = [
 ]
 
 genders = {"ru": ["Мужчина", "Женщина"], "en": ["Male", "Female"]}
-years_old = {"ru": ["год", "лет"], "en": ["years old"]}
+years_months = {"ru": ["год", "лет", "месяц"], "en": ["year", "month"]}
 born_on = {"ru": ["родился", "родилась"], "en": ["born on"]}
 
 
@@ -36,8 +40,8 @@ class FieldsExtractor:
         return
 
     def extract_age(self, text: str) -> typing.Optional[int]:
-        for y in years_old[self.template_lang]:
-            if res := re.search(fr"(\d+).+{y}", text):
+        for y in years_months[self.template_lang]:
+            if res := re.search(fr"(\d+)\s+{y}", text):
                 return int(res.group(1))
         return
 
@@ -78,9 +82,44 @@ class FieldsExtractor:
             return link[0]
         return
 
-    def extract(self, field_name: str, text: str):
+    @staticmethod
+    def extract_updated(text: str) -> typing.Optional[datetime]:
+        if match := re.search(r"(\d{2}\.\d{2}\.\d{4})\s\d{2}:\d{2}", text):
+            try:
+                d_t = datetime.strptime(match.group(), "%d.%m.%Y %H:%M")
+                return d_t
+            except ValueError:
+                return
+
+    def extract_experience_total(self, text: str) -> typing.Optional[str]:
+        if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])}).+", text):
+            return match.group()
+        return
+
+    @staticmethod
+    def extract_experience_items(text: list) -> list:
+        items = []
+        for duration, total, company, company_info, _, position, other in chunks(7, text):
+            items.append(
+                Experience.Item(
+                    duration=duration,
+                    total=total,
+                    company=company,
+                    company_info=company_info,
+                    position=position,
+                    other=other,
+                )
+            )
+        return items
+
+    @staticmethod
+    def extract_recommendations_items(text: list) -> list:
+        items = [Recommendations.Item(org=org, person=person) for org, person in chunks(2, text)]
+        return items
+
+    def extract(self, field_name: str, text: typing.Union[str, list]):
         try:
-            getter = getattr(self, f"extract_{field_name}")
+            getter = getattr(self, f"extract_{field_name.replace('.', '_')}")
             return getter(text)
         except AttributeError:
             logger.error(f"No extract_ method for <{field_name}> field found")
