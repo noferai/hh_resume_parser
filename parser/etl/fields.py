@@ -4,7 +4,7 @@ from datetime import datetime
 
 from funcy.seqs import chunks
 
-from parser.models import Experience, Recommendations
+from parser.models import Experience, Recommendations, Education, Languages
 from parser.config import logger
 
 
@@ -115,6 +115,24 @@ class FieldsExtractor:
     @staticmethod
     def extract_recommendations_items(text: list) -> list:
         items = [Recommendations.Item(org=org, person=person) for org, person in chunks(2, text)]
+        return items
+
+    @staticmethod
+    def extract_degree(text: str) -> typing.Optional[str]:
+        if match := re.search(r"\((.*)\)", text):
+            return match.group(1)
+        return text
+
+    @staticmethod
+    def extract_education_items(text: list) -> list:
+        items = [Education.Item(year=year, name=name, other=other) for year, name, other in chunks(3, text)]
+        return items
+
+    @staticmethod
+    def extract_languages_items(text: list) -> list:
+        items = [
+            Languages.Item(name=lang_i[0], lvl=", ".join(lang_i[1:])) for item in text if (lang_i := item.split(" — "))
+        ]
         return items
 
     def extract(self, field_name: str, text: typing.Union[str, list]):

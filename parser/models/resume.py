@@ -79,7 +79,7 @@ class Recommendations(Section):
 class Education(Section):
     class Item(BaseModel):
         year: str
-        place: str
+        name: str
         other: str
 
     title = Title(ru="Высшее образование", en="Higher education")
@@ -99,7 +99,8 @@ class Languages(Section):
 class Citizenship(Section):
     title = Title(ru="Гражданство, время в пути до работы", en="Citizenship, travel time to work")
     citizenship: str
-    permission: Optional[str]
+    permission: str
+    commute: str
 
 
 class Resume(BaseModel):

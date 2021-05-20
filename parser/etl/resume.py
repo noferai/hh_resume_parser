@@ -96,13 +96,21 @@ class ResumeETL:
         return section
 
     def get_education(self, raw: list) -> models.Education:
-        pass
+        section = models.Education(
+            degree=self.fields.extract("degree", raw.pop(0)), items=self.fields.extract("education.items", raw)
+        )
+        return section
 
     def get_languages(self, raw: list) -> models.Languages:
-        pass
+        section = models.Languages(items=self.fields.extract("languages.items", raw[1:]))
+        return section
 
-    def get_citizenship(self, raw: list) -> models.Citizenship:
-        pass
+    @staticmethod
+    def get_citizenship(raw: list) -> models.Citizenship:
+        section = models.Citizenship(
+            citizenship=raw[1].split(": ")[1], permission=raw[2].split(": ")[1], commute=raw[3].split(": ")[1]
+        )
+        return section
 
     def get_section(self, attr_name: str, data: list):
         try:
