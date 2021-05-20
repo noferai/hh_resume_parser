@@ -24,7 +24,7 @@ class Section(BaseModel):
 class General(Section):
     title = Title()
     name: str
-    gender: Optional[str]
+    gender: str
     birthday: Optional[str]
     age: Optional[int]
 
@@ -72,19 +72,29 @@ class Recommendations(Section):
         org: str
         person: str
 
-    title = Title(ru="Рекомендации", en="")
+    title = Title(ru="Рекомендации", en="Recommendations")
     items: List[Item]
 
 
 class Education(Section):
     class Item(BaseModel):
-        year: str
+        year: int
         name: str
         other: str
 
     title = Title(ru="Высшее образование", en="Higher education")
     degree: Optional[str]
-    items: List[Optional[Item]]
+    items: List[Item]
+
+
+class AdditionalEducation(Section):
+    class Item(BaseModel):
+        year: int
+        name: str
+        other: str
+
+    title = Title(ru="Повышение квалификации, курсы", en="Professional development, courses")
+    items: List[Item]
 
 
 class Languages(Section):
@@ -113,5 +123,5 @@ class Resume(BaseModel):
     recommendations = Recommendations
     education = Education
     languages = Languages
-    # training:
+    additional_edu = AdditionalEducation
     citizenship = Citizenship
