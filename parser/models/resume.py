@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, AnyUrl
+from pydantic import BaseModel, EmailStr, AnyUrl, validator
 
 
 class Title(BaseModel):
@@ -81,7 +81,7 @@ class Education(Section):
     class Item(BaseModel):
         year: int
         name: str
-        other: str
+        other: Optional[str]
 
     title = Title(ru="Высшее образование", en="Higher education")
     degree: Optional[str]
@@ -92,7 +92,7 @@ class AdditionalEducation(Section):
     class Item(BaseModel):
         year: int
         name: str
-        other: str
+        other: Optional[str]
 
     title = Title(ru="Повышение квалификации, курсы", en="Professional development, courses")
     items: List[Item]

@@ -2,7 +2,7 @@ import re
 import typing
 from datetime import datetime
 
-from funcy.seqs import chunks
+from funcy.seqs import chunks, with_next
 
 from parser.models import Experience, Recommendations, Education, Languages
 from parser.constants import months, genders, years_months, born_on
@@ -109,7 +109,9 @@ class FieldsExtractor:
 
     @staticmethod
     def extract_education_items(text: list) -> list:
-        items = [Education.Item(year=year, name=name, other=other) for year, name, other in chunks(3, text)]
+        indices = [i for i, x in enumerate(text) if x.isalnum()]
+        fields = list(Education.Item.__fields__.keys())
+        items = [Education.Item(**dict(zip(fields, text[i:next_]))) for i, next_ in with_next(indices)]
         return items
 
     @staticmethod
