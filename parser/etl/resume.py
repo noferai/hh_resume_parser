@@ -2,7 +2,7 @@ import re
 import typing
 
 from collections import defaultdict
-from langdetect import detect
+from langdetect import detect, DetectorFactory
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
@@ -20,6 +20,7 @@ class ResumeETL:
         self.fields = FieldsExtractor(self.template_lang, self.doc_lang)
 
     def detect_language(self) -> typing.Tuple[str, str]:
+        DetectorFactory.seed = 0
         ru_sections, en_sections = self.fetch_sections("ru"), self.fetch_sections("en")
         if len(ru_sections) > len(en_sections):
             template_lang = "ru"
@@ -95,7 +96,6 @@ class ResumeETL:
         section = models.Experience(
             total=self.fields.extract("experience.total", raw.pop(0)),
             items=self.fields.extract("experience.items", raw),
-            raw=raw,
         )
         return section
 

@@ -73,27 +73,22 @@ class FieldsExtractor:
                 return
 
     def extract_experience_total(self, text: str) -> typing.Optional[str]:
-        if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])}).+", text):
+        if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])})", text, re.IGNORECASE):
             return match.group()
         return
 
-    @staticmethod
-    def extract_experience_items(text: list) -> list:
+    def extract_experience_items(self, text: list) -> list:
+        _months = [m for _month in months for m in _month["name"][self.template_lang]]
+        indices = [*[i for i, p in enumerate(text) if any(m in p.lower() for m in _months)], len(text)]
+        fields = ["duration", "total", "company", "company_info", "position", "other"]
+        fields_w = ["duration", "total", "company", "position", "other"]
+
         items = []
-        if len(text) % (exp_len := len(Experience.Item.__fields__)) == 0:
-            for duration, total, company, company_info, position, other in chunks(exp_len, text):
-                items.append(
-                    Experience.Item(
-                        duration=duration,
-                        total=total,
-                        company=company,
-                        company_info=company_info,
-                        position=position,
-                        other=other,
-                    )
-                )
-        else:
-            logger.warn("Experience parsing error")
+        for i, next_ in with_next(indices, fill=0):
+            if next_ - i == 6:
+                items.append(Experience.Item(**dict(zip(fields, text[i:next_]))))
+            elif next_ - i == 5:
+                items.append(Experience.Item(**dict(zip(fields_w, text[i:next_]))))
         return items
 
     @staticmethod
@@ -109,7 +104,7 @@ class FieldsExtractor:
 
     @staticmethod
     def extract_education_items(text: list) -> list:
-        indices = [i for i, x in enumerate(text) if x.isalnum()]
+        indices = [i for i, x in enumerate(text) if x.isdigit()]
         fields = list(Education.Item.__fields__.keys())
         items = [Education.Item(**dict(zip(fields, text[i:next_]))) for i, next_ in with_next(indices)]
         return items

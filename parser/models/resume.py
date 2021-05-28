@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, AnyUrl, validator
+from pydantic import BaseModel, EmailStr, AnyUrl
 
 
 class Title(BaseModel):
@@ -55,7 +55,6 @@ class Experience(Section):
     title = Title(ru="Опыт работы", en="Work experience")
     total: str
     items: List[Item]
-    raw: list
 
 
 class Skills(Section):
