@@ -48,13 +48,14 @@ class Experience(Section):
         duration: str
         total: str
         company: str
-        company_info: str
+        company_info: Optional[str]
         position: str
         other: str
 
     title = Title(ru="Опыт работы", en="Work experience")
     total: str
     items: List[Item]
+    raw: list
 
 
 class Skills(Section):

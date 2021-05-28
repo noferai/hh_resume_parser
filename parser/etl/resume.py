@@ -1,29 +1,45 @@
 import re
+import typing
 
+from collections import defaultdict
+from langdetect import detect
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
-from parser.config import logger
+from parser.constants import show_more
 from .fields import FieldsExtractor
+from parser.config import logger, LanguageException
 
 
 class ResumeETL:
-    # RU only
-    # TODO: RU/EN detection & switch
-    template_lang = "ru"
-    doc_lang = "ru"
-
     def __init__(self, file_path: str):
         self.raw_paragraphs = get_paragraphs(file_path)
-        self.sections = self.fetch_sections()
+        self.template_lang, self.doc_lang = self.detect_language()
+        self.sections = self.fetch_sections(self.template_lang)
         self.populate_sections_raw()
         self.fields = FieldsExtractor(self.template_lang, self.doc_lang)
 
-    def fetch_sections(self) -> dict:
+    def detect_language(self) -> typing.Tuple[str, str]:
+        ru_sections, en_sections = self.fetch_sections("ru"), self.fetch_sections("en")
+        if len(ru_sections) > len(en_sections):
+            template_lang = "ru"
+            sections = [title for _, v in ru_sections.items() if len((title := v["title"])) > 0]
+        else:
+            template_lang = "en"
+            sections = [title for _, v in en_sections.items() if len((title := v["title"])) > 0]
+
+        content = " ".join(
+            [p.replace("\xa0", " ") for p in self.raw_paragraphs if not any(re.match(str(s), p) for s in sections)]
+        )
+        if (doc_lang := detect(content)) not in ("ru", "en"):
+            raise LanguageException
+        return template_lang, doc_lang
+
+    def fetch_sections(self, lang: str) -> dict:
         """
         Returns sections presented in current resume
         """
-        sections_re = {k: v.re(self.template_lang) for k, v in all_sections.items()}
+        sections_re = {k: v.re(lang) for k, v in all_sections.items()}
         return {
             k: {"title": v, "raw": []}
             for k, v in sections_re.items()
@@ -40,7 +56,8 @@ class ResumeETL:
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):
             while not re.match(self.sections[r_sec]["title"], p):
                 try:
-                    self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
+                    if not show_more[self.template_lang] in p:
+                        self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
                     p = next(p_iter)
                 except StopIteration:
                     break
@@ -78,6 +95,7 @@ class ResumeETL:
         section = models.Experience(
             total=self.fields.extract("experience.total", raw.pop(0)),
             items=self.fields.extract("experience.items", raw),
+            raw=raw,
         )
         return section
 
@@ -119,8 +137,10 @@ class ResumeETL:
         except AttributeError:
             logger.error(f"No getter method for <{attr_name}> attribute found")
 
-    def process(self):
+    def process(self) -> dict:
+        resume = defaultdict()
         for name, content in self.sections.items():
             raw = content.get("raw")
             if section := self.get_section(name, raw):
-                logger.info(section.dict())
+                resume[name] = section.dict()
+        return resume

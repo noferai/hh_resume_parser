@@ -1,4 +1,4 @@
-googletrans
+langdetect
 lxml
 pydantic[email]
 funcy
