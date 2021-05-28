@@ -1,4 +1,9 @@
 .idea/
 venv/
+.pytest_cache/
+
+# Data
 *.docx
+*.doc
+*.pdf
 *.xml

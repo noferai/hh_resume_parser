@@ -14,13 +14,6 @@ class FieldsExtractor:
         self.template_lang = template_lang
         self.doc_lang = doc_lang
 
-    @staticmethod
-    def prepare_experience(text: list):
-        for i in range(len(text)):
-            if text[i].startswith("www"):
-                text[i - 1] = f"{text[i - 1]}, {text[i]}"
-                del text[i]
-
     def extract_gender(self, text: str):
         for g in genders[self.template_lang]:
             if res := re.search(g, text):

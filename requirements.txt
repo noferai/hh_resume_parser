@@ -2,3 +2,4 @@ langdetect
 lxml
 pydantic[email]
 funcy
+pytest
