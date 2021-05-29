@@ -23,6 +23,7 @@ all_sections = {
         "skills",
         "about",
         "recommendations",
+        "portfolio",
         "education",
         "languages",
         "citizenship",

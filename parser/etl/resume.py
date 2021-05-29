@@ -6,7 +6,7 @@ from langdetect import detect, DetectorFactory
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
-from parser.constants import show_more
+from parser.constants import show_more, recommendation_restriction
 from .fields import FieldsExtractor
 from parser.config import logger, LanguageException
 
@@ -44,7 +44,7 @@ class ResumeETL:
         return {
             k: {"title": v, "raw": []}
             for k, v in sections_re.items()
-            if any(re.match(str(v), par) for par in self.raw_paragraphs)
+            if any(re.search(str(v), par, re.IGNORECASE) for par in self.raw_paragraphs)
         }
 
     def populate_sections_raw(self):
@@ -55,7 +55,7 @@ class ResumeETL:
         p_iter = iter(self.raw_paragraphs)
         p = next(p_iter)
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):
-            while not re.match(self.sections[r_sec]["title"], p):
+            while not re.search(self.sections[r_sec]["title"], p, re.IGNORECASE):
                 try:
                     if not show_more[self.template_lang] in p:
                         self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
@@ -110,7 +110,10 @@ class ResumeETL:
         return section
 
     def get_recommendations(self, raw: list) -> models.Recommendations:
-        section = models.Recommendations(items=self.fields.extract("recommendations.items", raw[1:]))
+        if raw[1] == recommendation_restriction[self.template_lang]:
+            section = models.Recommendations(other=raw[1])
+        else:
+            section = models.Recommendations(items=self.fields.extract("recommendations.items", raw[1:]))
         return section
 
     def get_education(self, raw: list) -> models.Education:

@@ -17,3 +17,7 @@ genders = {"ru": ("Мужчина", "Женщина"), "en": ("Male", "Female")}
 years_months = {"ru": ("год", "лет", "месяц"), "en": ("year", "month")}
 born_on = {"ru": ("родился", "родилась"), "en": ("born on",)}
 show_more = {"ru": "Показать еще", "en": "Show more"}
+recommendation_restriction = {
+    "ru": "Рекомендации предоставляются по запросу",
+    "en": "Recommendations available upon request",
+}

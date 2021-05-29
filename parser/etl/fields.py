@@ -5,7 +5,7 @@ from datetime import datetime
 from funcy.seqs import chunks, with_next
 
 from parser.models import Experience, Recommendations, Education, Languages
-from parser.constants import months, genders, years_months, born_on
+from parser.constants import months, genders, years_months, born_on, recommendation_restriction
 from parser.config import logger
 
 

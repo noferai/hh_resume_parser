@@ -73,7 +73,12 @@ class Recommendations(Section):
         person: str
 
     title = Title(ru="Рекомендации", en="Recommendations")
-    items: List[Item]
+    items: Optional[List[Item]]
+    other: Optional[str]
+
+
+class Portfolio(Section):
+    title = Title(ru="Портфолио", en="Portfolio")
 
 
 class Education(Section):
@@ -82,7 +87,7 @@ class Education(Section):
         name: str
         other: Optional[str]
 
-    title = Title(ru="Высшее образование", en="Higher education")
+    title = Title(ru="Образование", en="Education")
     degree: Optional[str]
     items: List[Item]
 
@@ -121,6 +126,7 @@ class Resume(BaseModel):
     skills = Skills
     about = About
     recommendations = Recommendations
+    portfolio = Portfolio
     education = Education
     languages = Languages
     additional_edu = AdditionalEducation
