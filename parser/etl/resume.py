@@ -55,7 +55,7 @@ class ResumeETL:
         p_iter = iter(self.raw_paragraphs)
         p = next(p_iter)
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):
-            while not re.search(self.sections[r_sec]["title"], p, re.IGNORECASE):
+            while not re.match(self.sections[r_sec]["title"], p, re.IGNORECASE):
                 try:
                     if not show_more[self.template_lang] in p:
                         self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
@@ -64,6 +64,7 @@ class ResumeETL:
                     break
 
     def get_general(self, raw: list) -> models.General:
+        # TODO: name parsing
         name = raw.pop(0)
         raw_str = " ".join(raw)
         section = models.General(
@@ -126,11 +127,8 @@ class ResumeETL:
         section = models.Languages(items=self.fields.extract("languages.items", raw[1:]))
         return section
 
-    @staticmethod
-    def get_citizenship(raw: list) -> models.Citizenship:
-        section = models.Citizenship(
-            citizenship=raw[1].split(": ")[1], permission=raw[2].split(": ")[1], commute=raw[3].split(": ")[1]
-        )
+    def get_citizenship(self, raw: list) -> models.Citizenship:
+        section = models.Citizenship(**self.fields.extract("citizenship", raw[1:]))
         return section
 
     def get_section(self, attr_name: str, data: list):

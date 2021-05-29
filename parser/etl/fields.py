@@ -5,7 +5,7 @@ from datetime import datetime
 from funcy.seqs import chunks, with_next
 
 from parser.models import Experience, Recommendations, Education, Languages
-from parser.constants import months, genders, years_months, born_on, recommendation_restriction
+from parser.constants import months, genders, years_months, born_on, citizenship
 from parser.config import logger
 
 
@@ -115,6 +115,14 @@ class FieldsExtractor:
             Languages.Item(name=lang_i[0], lvl=", ".join(lang_i[1:])) for item in text if (lang_i := item.split(" — "))
         ]
         return items
+
+    def extract_citizenship(self, text: list) -> dict:
+        result = dict()
+        for p in text:
+            for k, v in citizenship.items():
+                if re.search(v[self.template_lang], p, re.IGNORECASE):
+                    result[k] = p.split(": ")[1]
+        return result
 
     def extract(self, field_name: str, text: typing.Union[str, list]):
         try:

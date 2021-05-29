@@ -21,3 +21,8 @@ recommendation_restriction = {
     "ru": "Рекомендации предоставляются по запросу",
     "en": "Recommendations available upon request",
 }
+citizenship = {
+    "citizenship": {"ru": "Гражданство", "en": "Citizenship"},
+    "permission": {"ru": "Разрешение", "en": "Permission"},
+    "commute": {"ru": "Время в пути ", "en": "Travel"},
+}

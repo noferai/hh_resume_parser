@@ -113,9 +113,9 @@ class Languages(Section):
 
 class Citizenship(Section):
     title = Title(ru="Гражданство, время в пути до работы", en="Citizenship, travel time to work")
-    citizenship: str
-    permission: str
-    commute: str
+    citizenship: Optional[str]
+    permission: Optional[str]
+    commute: Optional[str]
 
 
 class Resume(BaseModel):
