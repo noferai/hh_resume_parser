@@ -2,7 +2,7 @@ import re
 import typing
 
 from collections import defaultdict
-from langdetect import detect, DetectorFactory
+from langdetect import DetectorFactory, detect_langs
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
@@ -32,7 +32,12 @@ class ResumeETL:
         content = " ".join(
             [p.replace("\xa0", " ") for p in self.raw_paragraphs if not any(re.match(str(s), p) for s in sections)]
         )
-        if (doc_lang := detect(content)) not in ("ru", "en"):
+        doc_lang = None
+        for _l in detect_langs(content):
+            if _l.lang == "ru" or _l.lang == "en":
+                doc_lang = _l.lang
+                break
+        if not doc_lang:
             raise LanguageException
         return template_lang, doc_lang
 
@@ -51,7 +56,7 @@ class ResumeETL:
         """
         Populates resume's sections with raw content
         """
-        d_keys = [*self.sections.keys(), "contacts"]
+        d_keys = [*self.sections.keys(), "general"]
         p_iter = iter(self.raw_paragraphs)
         p = next(p_iter)
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):

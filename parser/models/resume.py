@@ -24,14 +24,15 @@ class Section(BaseModel):
 
 class General(Section):
     title = Title(exact=False)
-    name: str
-    gender: str
+    name: Optional[str]
+    gender: Optional[str]
     birthday: Optional[str]
     age: Optional[int]
 
-    @validator("name", "gender")
+    @validator("name")
     def is_alphabetic(cls, v: str):
-        assert not any(c.isdigit() for c in v), "Must be alphabetic"
+        if v is not None:
+            assert not any(c.isdigit() for c in v), "Must be alphabetic"
         return v
 
 
