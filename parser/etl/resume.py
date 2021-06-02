@@ -6,7 +6,7 @@ from langdetect import detect, DetectorFactory
 from parser.converters.docx import get_paragraphs
 from parser.models import all_sections
 import parser.models as models
-from parser.constants import show_more, recommendation_restriction
+from parser.constants import show_more
 from .fields import FieldsExtractor
 from parser.config import logger, LanguageException
 
@@ -44,7 +44,7 @@ class ResumeETL:
         return {
             k: {"title": v, "raw": []}
             for k, v in sections_re.items()
-            if any(re.search(str(v), par, re.IGNORECASE) for par in self.raw_paragraphs)
+            if any(re.search(fr"{v}", par, re.IGNORECASE) for par in self.raw_paragraphs)
         }
 
     def populate_sections_raw(self):
@@ -55,7 +55,7 @@ class ResumeETL:
         p_iter = iter(self.raw_paragraphs)
         p = next(p_iter)
         for l_sec, r_sec in zip(d_keys, d_keys[1:]):
-            while not re.match(self.sections[r_sec]["title"], p, re.IGNORECASE):
+            while not re.search(self.sections[r_sec]["title"], p, re.IGNORECASE):
                 try:
                     if not show_more[self.template_lang] in p:
                         self.sections[l_sec]["raw"].append(p.replace("\xa0", " "))
@@ -64,8 +64,12 @@ class ResumeETL:
                     break
 
     def get_general(self, raw: list) -> models.General:
-        # TODO: name parsing
-        name = raw.pop(0)
+        if "на сайте" in raw[0]:
+            raw.pop(0)
+        if self.fields.extract("gender", raw[0]):
+            name = None
+        else:
+            name = raw.pop(0)
         raw_str = " ".join(raw)
         section = models.General(
             name=name,
@@ -105,17 +109,25 @@ class ResumeETL:
         section = models.Skills(items=raw[1:])
         return section
 
+    def get_driving(self, raw: list) -> models.Driving:
+        section = models.Driving(
+            own_car=self.fields.extract("own_car", raw[1:]),
+            categories=self.fields.extract("driving_categories", raw[1:]),
+        )
+        return section
+
     @staticmethod
     def get_about(raw: list) -> models.About:
         section = models.About(text="\n".join(raw[1:]))
         return section
 
-    def get_recommendations(self, raw: list) -> models.Recommendations:
-        if raw[1] == recommendation_restriction[self.template_lang]:
-            section = models.Recommendations(other=raw[1])
-        else:
-            section = models.Recommendations(items=self.fields.extract("recommendations.items", raw[1:]))
-        return section
+    @staticmethod
+    def get_recommendations(raw: list) -> models.Recommendations:
+        return models.Recommendations(items=raw[1:])
+
+    @staticmethod
+    def get_portfolio(raw: list):
+        pass
 
     def get_education(self, raw: list) -> models.Education:
         section = models.Education(
@@ -125,6 +137,20 @@ class ResumeETL:
 
     def get_languages(self, raw: list) -> models.Languages:
         section = models.Languages(items=self.fields.extract("languages.items", raw[1:]))
+        return section
+
+    @staticmethod
+    def get_tests(raw: list) -> models.Tests:
+        section = models.Tests(other="\n".join(raw[1:]))
+        return section
+
+    @staticmethod
+    def get_certificates(raw: list) -> models.Certificates:
+        section = models.Certificates(other="\n".join(raw[1:]))
+        return section
+
+    def get_additional_edu(self, raw: list) -> models.AdditionalEducation:
+        section = models.AdditionalEducation(items=self.fields.extract("additional_edu.items", raw[1:]))
         return section
 
     def get_citizenship(self, raw: list) -> models.Citizenship:

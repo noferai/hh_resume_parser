@@ -4,10 +4,15 @@ from .resume import (
     Position,
     Experience,
     Skills,
+    Driving,
     About,
     Recommendations,
+    Portfolio,
     Education,
     Languages,
+    AdditionalEducation,
+    Tests,
+    Certificates,
     Citizenship,
 )
 from .resume import Resume
@@ -21,11 +26,15 @@ all_sections = {
         "position",
         "experience",
         "skills",
+        "driving",
         "about",
         "recommendations",
         "portfolio",
         "education",
         "languages",
+        "additional_edu",
+        "tests",
+        "certificates",
         "citizenship",
     ]
 }

@@ -17,12 +17,9 @@ genders = {"ru": ("Мужчина", "Женщина"), "en": ("Male", "Female")}
 years_months = {"ru": ("год", "лет", "месяц"), "en": ("year", "month")}
 born_on = {"ru": ("родился", "родилась"), "en": ("born on",)}
 show_more = {"ru": "Показать еще", "en": "Show more"}
-recommendation_restriction = {
-    "ru": "Рекомендации предоставляются по запросу",
-    "en": "Recommendations available upon request",
-}
 citizenship = {
     "citizenship": {"ru": "Гражданство", "en": "Citizenship"},
     "permission": {"ru": "Разрешение", "en": "Permission"},
     "commute": {"ru": "Время в пути ", "en": "Travel"},
 }
+own_car = {"ru": "Имеется собственный автомобиль", "en": "Own car"}

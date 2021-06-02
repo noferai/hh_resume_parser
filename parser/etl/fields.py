@@ -2,10 +2,10 @@ import re
 import typing
 from datetime import datetime
 
-from funcy.seqs import chunks, with_next
+from funcy.seqs import with_next
 
-from parser.models import Experience, Recommendations, Education, Languages
-from parser.constants import months, genders, years_months, born_on, citizenship
+from parser.models import Experience, Education, Languages, AdditionalEducation
+from parser.constants import months, genders, years_months, born_on, citizenship, own_car
 from parser.config import logger
 
 
@@ -43,7 +43,7 @@ class FieldsExtractor:
                             birthday += f".{_month['value']:02d}"
                 if year := re.search(r"\d{4}", res_str):
                     birthday += f".{year.group()}"
-        return birthday
+        return birthday if len(birthday) > 0 else None
 
     @staticmethod
     def extract_email(text: str) -> typing.Optional[str]:
@@ -73,7 +73,7 @@ class FieldsExtractor:
                 return
 
     def extract_experience_total(self, text: str) -> typing.Optional[str]:
-        if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])})", text, re.IGNORECASE):
+        if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])}).?", text, re.IGNORECASE):
             return match.group()
         return
 
@@ -91,10 +91,18 @@ class FieldsExtractor:
                 items.append(Experience.Item(**dict(zip(fields_w, text[i:next_]))))
         return items
 
-    @staticmethod
-    def extract_recommendations_items(text: list) -> list:
-        items = [Recommendations.Item(org=org, person=person) for org, person in chunks(2, text)]
-        return items
+    def extract_own_car(self, text: list) -> bool:
+        for s in text:
+            if s == own_car[self.template_lang]:
+                return True
+        return False
+
+    def extract_driving_categories(self, text: list) -> list:
+        categories = []
+        for s in text:
+            if s != own_car[self.template_lang]:
+                categories = [w.replace(",", "") for w in s.split() if len(w) <= 3]
+        return categories
 
     @staticmethod
     def extract_degree(text: str) -> typing.Optional[str]:
@@ -107,6 +115,13 @@ class FieldsExtractor:
         indices = [i for i, x in enumerate(text) if x.isdigit()]
         fields = list(Education.Item.__fields__.keys())
         items = [Education.Item(**dict(zip(fields, text[i:next_]))) for i, next_ in with_next(indices)]
+        return items
+
+    @staticmethod
+    def extract_additional_edu_items(text: list) -> list:
+        indices = [i for i, x in enumerate(text) if x.isdigit()]
+        fields = list(AdditionalEducation.Item.__fields__.keys())
+        items = [AdditionalEducation.Item(**dict(zip(fields, text[i:next_]))) for i, next_ in with_next(indices)]
         return items
 
     @staticmethod
