@@ -3,3 +3,6 @@ lxml
 pydantic[email]
 funcy
 pytest
+fastapi
+uvicorn[standard]
+python-multipart

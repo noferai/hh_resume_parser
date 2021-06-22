@@ -2,7 +2,7 @@
 venv/
 .pytest_cache/
 
-# Data
+# data
 *.docx
 *.doc
 *.pdf
