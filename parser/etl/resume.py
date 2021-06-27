@@ -12,8 +12,8 @@ from parser.config import logger, LanguageException
 
 
 class ResumeETL:
-    def __init__(self, file_path: str):
-        self.raw_paragraphs = get_paragraphs(file_path)
+    def __init__(self, file: typing.IO[bytes]):
+        self.raw_paragraphs = get_paragraphs(file)
         self.template_lang, self.doc_lang = self.detect_language()
         self.sections = self.fetch_sections(self.template_lang)
         self.populate_sections_raw()

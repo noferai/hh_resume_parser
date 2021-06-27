@@ -1,4 +1,6 @@
 import zipfile
+import typing
+
 from lxml import etree
 
 # MS Word prefixes / namespace matches used in document.xml
@@ -23,21 +25,21 @@ ns_prefixes = {
 }
 
 
-def get_xml(file_path: str):
+def get_xml(file: typing.IO[bytes]):
     """
     Returns raw MS Word xml
     """
-    with zipfile.ZipFile(file_path) as doc:
+    with zipfile.ZipFile(file) as doc:
         xml_content = doc.read("word/document.xml")
     document = etree.fromstring(xml_content)
     return document
 
 
-def get_paragraphs(file_path: str) -> list:
+def get_paragraphs(file: typing.IO[bytes]) -> list:
     """
     Returns the raw text of a document as a list of paragraphs
     """
-    doc_xml = get_xml(file_path)
+    doc_xml = get_xml(file)
     paragraphs = [element for element in doc_xml.iter() if element.tag == f"{ns_prefixes['w']}p"]
     text = []
 
