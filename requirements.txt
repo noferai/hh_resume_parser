@@ -3,6 +3,7 @@ lxml
 pydantic[email]
 funcy
 pytest
+httpx
 fastapi
 uvicorn[standard]
 python-multipart
