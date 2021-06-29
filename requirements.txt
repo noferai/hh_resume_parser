@@ -7,3 +7,4 @@ httpx
 fastapi
 uvicorn[standard]
 python-multipart
+notion-client
