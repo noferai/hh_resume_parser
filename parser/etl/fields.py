@@ -5,7 +5,7 @@ from datetime import datetime
 from funcy.seqs import with_next
 
 from parser.models import Experience, Education, Languages, AdditionalEducation
-from parser.constants import months, genders, years_months, born_on, citizenship, own_car
+from parser.constants import months, genders, years_months, born_on, citizenship, own_car, willing
 from config import logger
 
 
@@ -63,11 +63,12 @@ class FieldsExtractor:
             return link[0]
         return
 
-    @staticmethod
-    def extract_salary(text: str) -> typing.Optional[str]:
-        for word in text.split("\n"):
-            if any(str.isdigit(c) for c in word):
-                return word
+    def extract_location(self, text: str) -> typing.Optional[str]:
+        location = list()
+        for word in text.split(","):
+            if willing[self.template_lang] in word:
+                return ", ".join(location)
+            location.append(word)
 
     @staticmethod
     def extract_updated(text: str) -> typing.Optional[datetime]:
@@ -77,6 +78,12 @@ class FieldsExtractor:
                 return d_t
             except ValueError:
                 return
+
+    @staticmethod
+    def extract_salary(text: str) -> typing.Optional[str]:
+        for word in text.split("\n"):
+            if any(str.isdigit(c) for c in word):
+                return word
 
     def extract_experience_total(self, text: str) -> typing.Optional[str]:
         if match := re.search(fr"\d+\s+({'|'.join(years_months[self.template_lang])}).?", text, re.IGNORECASE):

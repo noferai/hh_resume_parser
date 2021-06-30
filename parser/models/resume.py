@@ -41,6 +41,7 @@ class Contacts(Section):
     phones: List[Optional[str]]
     emails: List[Optional[EmailStr]]
     links: List[Optional[AnyUrl]]
+    location: Optional[str]
 
 
 class Position(Section):

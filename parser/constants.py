@@ -23,3 +23,4 @@ citizenship = {
     "commute": {"ru": "Время в пути ", "en": "Travel"},
 }
 own_car = {"ru": "Имеется собственный автомобиль", "en": "Own car"}
+willing = {"ru": "готов", "en": "willing"}
