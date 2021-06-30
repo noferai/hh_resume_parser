@@ -6,7 +6,7 @@ from funcy.seqs import with_next
 
 from parser.models import Experience, Education, Languages, AdditionalEducation
 from parser.constants import months, genders, years_months, born_on, citizenship, own_car
-from parser.config import logger
+from config import logger
 
 
 class FieldsExtractor:
@@ -62,6 +62,12 @@ class FieldsExtractor:
         if link := re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", text):
             return link[0]
         return
+
+    @staticmethod
+    def extract_salary(text: str) -> typing.Optional[str]:
+        for word in text.split("\n"):
+            if any(str.isdigit(c) for c in word):
+                return word
 
     @staticmethod
     def extract_updated(text: str) -> typing.Optional[datetime]:
