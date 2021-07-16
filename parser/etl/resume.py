@@ -159,11 +159,6 @@ class ResumeETL:
         return section
 
     @slice_raw
-    def get_tests(self, raw: list) -> models.Tests:
-        section = models.Tests(other=raw)
-        return section
-
-    @slice_raw
     def get_certificates(self, raw: list) -> models.Certificates:
         section = models.Certificates(other=raw)
         return section
@@ -171,6 +166,11 @@ class ResumeETL:
     @slice_raw
     def get_additional_edu(self, raw: list) -> models.AdditionalEducation:
         section = models.AdditionalEducation(items=self.fields.extract("additional_edu.items", raw))
+        return section
+
+    @slice_raw
+    def get_tests(self, raw: list) -> models.Tests:
+        section = models.Tests(items=self.fields.extract("additional_edu.items", raw))
         return section
 
     @slice_raw

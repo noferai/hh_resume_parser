@@ -166,7 +166,7 @@ class Languages(Section):
     items: List[Item]
 
 
-class Tests(Section):
+class Tests(AdditionalEducation):
     title = Title(ru="Тесты, экзамены", en="Tests, examinations")
 
 
