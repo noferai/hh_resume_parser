@@ -4,6 +4,8 @@ from datetime import datetime
 import funcy as fc
 from pydantic import BaseModel, EmailStr, AnyUrl, Field, validator
 
+from .utils import fix_paragraph
+
 
 class Title(BaseModel):
     searchable: bool = True
@@ -78,6 +80,12 @@ class Experience(Section):
         def join_str(cls, v):
             return fc.str_join(v)
 
+        @validator("other", pre=True)
+        def fix_text(cls, v):
+            if isinstance(v, list):
+                return fix_paragraph(v)
+            return v
+
     title = Title(ru="Опыт работы", en="Work experience", exact=False)
     min_length = 3
     total: str
@@ -98,6 +106,12 @@ class Driving(Section):
 class About(Section):
     title = Title(ru="Обо мне", en="About me")
     text: Union[str, list]
+
+    @validator("text", pre=True)
+    def fix_text(cls, v):
+        if isinstance(v, list):
+            return fix_paragraph(v)
+        return v
 
 
 class Recommendations(Section):
