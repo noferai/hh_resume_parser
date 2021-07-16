@@ -24,3 +24,5 @@ citizenship = {
 }
 own_car = {"ru": "Имеется собственный автомобиль", "en": "Own car"}
 willing = {"ru": "готов", "en": "willing"}
+
+SECTION_TITLE_MAX = 40

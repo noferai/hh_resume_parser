@@ -23,12 +23,22 @@ ns_prefixes = {
     "r": "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}",
     "pr": "{http://schemas.openxmlformats.org/package/2006/relationships}",
 }
+spec_chars = ["(", ")"]
+
+
+def normalize_text(text: list, threshold: int) -> typing.Union[list, str]:
+    i = 1
+    while i < len(text):
+        if len(text[i].split()) < threshold or len(text[i - 1].split()) < threshold:
+            text[i - 1 : i + 1] = ["".join(text[i - 1 : i + 1])]
+            i = 0
+        i += 1
+
+    return text[0] if len(text) == 1 else text
 
 
 def get_xml(file: typing.IO[bytes]):
-    """
-    Returns raw MS Word xml
-    """
+    """Returns raw MS Word xml"""
     with zipfile.ZipFile(file) as doc:
         xml_content = doc.read("word/document.xml")
     document = etree.fromstring(xml_content)
@@ -36,21 +46,20 @@ def get_xml(file: typing.IO[bytes]):
 
 
 def get_paragraphs(file: typing.IO[bytes]) -> list:
-    """
-    Returns the raw text of a document as a list of paragraphs
-    """
+    """Returns the raw text of a document as a list of paragraphs"""
     doc_xml = get_xml(file)
     paragraphs = [element for element in doc_xml.iter() if element.tag == f"{ns_prefixes['w']}p"]
     text = []
 
     for paragraph in paragraphs:
-        p_text = ""
+        p_line = []
         for element in paragraph.iter():
             if element.tag == f"{ns_prefixes['w']}t":
                 if element.text:
-                    p_text += element.text
-            elif element.tag == f"{ns_prefixes['w']}tab":
-                p_text += "\t"
-        if len(p_text) > 0:
-            text.append(p_text)
+                    p_line.append(element.text.replace("\xa0", " "))
+        if len(p_line) > 0:
+            if len(p_line) > 1:
+                text.append(p_line)
+            else:
+                text.extend(p_line)
     return text

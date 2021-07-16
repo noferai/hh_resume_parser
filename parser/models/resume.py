@@ -1,5 +1,7 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime
+
+import funcy as fc
 from pydantic import BaseModel, EmailStr, AnyUrl, Field, validator
 
 
@@ -12,28 +14,35 @@ class Title(BaseModel):
 
 class Section(BaseModel):
     title: Title
-    other: Optional[str]
+    min_length: int = 2
+    other: Optional[Union[str, list]]
 
     @classmethod
-    def re(cls, lang: str) -> Optional[str]:
+    def re(cls, lang: str) -> Optional[dict]:
         d_title = cls.__fields__["title"].default.dict()
+        d_length = cls.__fields__["min_length"].default
         if d_title["searchable"]:
-            return f"^{d_title[lang]}$" if d_title["exact"] else d_title[lang]
+            return {"title": f"^{d_title[lang]}$" if d_title["exact"] else d_title[lang], "min_length": d_length}
         return None
 
 
 class General(Section):
-    title = Title(exact=False)
-    name: Optional[str]
+    title = Title(searchable=False)
+    name: Optional[Union[str, list]]
     gender: Optional[str]
     birthday: Optional[str]
     age: Optional[int]
 
     @validator("name")
     def is_alphabetic(cls, v: str):
-        if v is not None:
+        if v:
             assert not any(c.isdigit() for c in v), "Must be alphabetic"
         return v
+
+    @validator("name", pre=True)
+    def join_str(cls, v):
+        if v:
+            return fc.str_join(v)
 
 
 class Contacts(Section):
@@ -46,21 +55,31 @@ class Contacts(Section):
 
 class Position(Section):
     title = Title(ru="Резюме обновлено", en="Resume updated", exact=False)
+    min_length = 1
     name: str
     salary: Optional[str]
     updated: datetime
 
+    @validator("name", pre=True)
+    def join_str(cls, v):
+        return fc.str_join(v)
+
 
 class Experience(Section):
     class Item(BaseModel):
-        duration: str
-        total: str
-        company: str
-        company_info: Optional[str]
-        position: str
-        other: str
+        duration: Union[str, list]
+        total: Union[str, list]
+        company: Union[str, list]
+        company_info: Optional[Union[str, list]]
+        position: Union[str, list]
+        other: Union[str, list]
+
+        @validator("duration", "total", "company", "company_info", "position", pre=True)
+        def join_str(cls, v):
+            return fc.str_join(v)
 
     title = Title(ru="Опыт работы", en="Work experience", exact=False)
+    min_length = 3
     total: str
     items: List[Item]
 
@@ -78,12 +97,16 @@ class Driving(Section):
 
 class About(Section):
     title = Title(ru="Обо мне", en="About me")
-    text: str
+    text: Union[str, list]
 
 
 class Recommendations(Section):
     title = Title(ru="Рекомендации", en="Recommendations")
-    items: List[str]
+    items: List[Union[str, list]]
+
+    @validator("items", pre=True)
+    def join_str(cls, v):
+        return [fc.str_join(i) for i in v]
 
 
 class Portfolio(Section):
@@ -94,9 +117,14 @@ class Education(Section):
     class Item(BaseModel):
         year: int
         name: str = Field(..., min_length=1)
-        other: Optional[str]
+        other: Union[str, list, None]
+
+        @validator("year", "name", "other", pre=True)
+        def join_str(cls, v):
+            return fc.str_join(v)
 
     title = Title(ru="Образование", en="Education", exact=False)
+    min_length = 4
     degree: Optional[str]
     items: List[Item]
 
@@ -105,7 +133,11 @@ class AdditionalEducation(Section):
     class Item(BaseModel):
         year: int
         name: str = Field(..., min_length=1)
-        other: Optional[str]
+        other: Union[str, list, None]
+
+        @validator("year", "name", "other", pre=True)
+        def join_str(cls, v):
+            return fc.str_join(v)
 
     title = Title(ru="Повышение квалификации, курсы", en="Professional development, courses")
     items: List[Item]

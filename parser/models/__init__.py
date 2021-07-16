@@ -21,7 +21,6 @@ from .resume import Resume
 all_sections = {
     section: getattr(Resume, section)
     for section in [
-        "general",
         "contacts",
         "position",
         "experience",
