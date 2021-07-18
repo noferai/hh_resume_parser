@@ -4,11 +4,13 @@ from typing import Optional
 import uvicorn
 import httpx
 from fastapi import FastAPI
+from notion_client import AsyncClient
 
 from parser.etl import ResumeETL
-from config import TG_TOKEN, TG_CHAT_ID
+from config import TG_TOKEN, TG_CHAT_ID, NOTION_TOKEN, NOTION_PAGE_ID
 
 app = FastAPI()
+notion = AsyncClient(auth=NOTION_TOKEN)
 
 
 async def send_tg_message(message: str):
@@ -27,8 +29,9 @@ async def get_file(url: str) -> bytes:
 async def convert(url: Optional[str]):
     resp = await get_file(url)
     extractor = ResumeETL(file=io.BytesIO(resp))
-    res = extractor.process()
-    await send_tg_message(res["general"]["name"])
+    resume = extractor.to_notion()
+    notion_resp = await notion.pages.create(parent={"page_id": NOTION_PAGE_ID}, **resume)
+    await send_tg_message(notion_resp["url"])
 
 
 if __name__ == "__main__":
