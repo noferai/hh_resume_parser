@@ -6,5 +6,6 @@ pytest
 httpx
 fastapi
 uvicorn[standard]
+gunicorn
 python-multipart
 notion-client
