@@ -76,7 +76,7 @@ class NotionConverter:
                 items.extend(
                     [
                         self.block_wrapper(
-                            "heading_3",
+                            "paragraph",
                             self.text_wrapper(
                                 f"{item['duration']} - {item['company']}{', %s'%item['company_info'] if item['company_info'] else ''}",
                                 bold=True,
@@ -124,7 +124,7 @@ class NotionConverter:
         for item in section["items"]:
             items.extend(
                 [
-                    self.block_wrapper("heading_3", self.text_wrapper(f"{item['name']} - {item['year']}", bold=True)),
+                    self.block_wrapper("paragraph", self.text_wrapper(f"{item['name']} - {item['year']}", bold=True)),
                     self.block_wrapper("paragraph", self.text_wrapper(item["other"])),
                 ]
             )
@@ -167,7 +167,7 @@ class NotionConverter:
     def convert_section(self, attr_name: str, data: dict) -> list:
         try:
             converter = getattr(self, f"convert_{attr_name}")
-            section_title = self.block_wrapper("heading_1", self.text_wrapper(data.pop("title")[self.template_lang]))
+            section_title = self.block_wrapper("heading_2", self.text_wrapper(data.pop("title")[self.template_lang]))
             section_content = converter(data)
             return [section_title, *section_content]
         except AttributeError:
