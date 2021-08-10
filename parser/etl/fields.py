@@ -122,14 +122,14 @@ class FieldsExtractor:
 
     def extract_own_car(self, text: list) -> bool:
         for s in text:
-            if s == own_car[self.template_lang]:
+            if s == own_car["has"][self.template_lang]:
                 return True
         return False
 
     def extract_driving_categories(self, text: list) -> list:
         categories = []
         for s in text:
-            if s != own_car[self.template_lang]:
+            if s != own_car["has"][self.template_lang]:
                 categories = [w.replace(",", "") for w in s.split() if len(w) <= 3]
         return categories
 
