@@ -22,7 +22,17 @@ citizenship = {
     "permission": {"ru": "Разрешение", "en": "Permission"},
     "commute": {"ru": "Время в пути ", "en": "Travel"},
 }
-own_car = {"ru": "Имеется собственный автомобиль", "en": "Own car"}
+own_car = {
+    "has": {"ru": "Имеется собственный автомобиль", "en": "Own car"},
+    "categories": {"ru": "Категории", "en": "Categories"},
+}
 willing = {"ru": "готов", "en": "willing"}
+total = {"ru": "Общий стаж", "en": "Total"}
+personal = {
+    "title": {"ru": "Личные данные", "en": "Personal"},
+    "birthday": {"ru": "Дата рождения", "en": "Date of birth"},
+    "location": {"ru": "Место нахождения", "en": "Location"},
+    "contacts": {"ru": "Контакты", "en": "Contacts"},
+}
 
 SECTION_TITLE_MAX = 40

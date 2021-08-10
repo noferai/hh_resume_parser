@@ -196,5 +196,5 @@ class ResumeETL:
 
     def to_notion(self) -> dict:
         f_sections = self.get_resume()
-        notion_page = NotionConverter(f_sections).convert_resume()
+        notion_page = NotionConverter(f_sections, self.template_lang).convert_resume()
         return notion_page

@@ -1,22 +1,24 @@
 import copy
 from collections import defaultdict
-from config import logger
+
+from parser.constants import personal, total, own_car, citizenship
 
 
 class NotionConverter:
-    def __init__(self, sections: dict):
+    def __init__(self, sections: dict, template_lang: str):
         sections = copy.deepcopy(sections)
         _general = sections.pop("general")
         _contacts = sections.pop("contacts") if "contacts" in sections else defaultdict(lambda: "")
         _position = sections.pop("position") if "position" in sections else defaultdict(lambda: "")
         self.personal = {
-            "name": _general["name"] if _general["name"] else "Не указано",
-            "birthday": _general["birthday"] if _general["birthday"] else "Не указано",
+            "name": _general["name"] if _general["name"] else "-",
+            "birthday": _general["birthday"] if _general["birthday"] else "-",
             "contacts": ", ".join([*_contacts["phones"], *_contacts["emails"], *_contacts["links"]]),
-            "location": _contacts["location"] if _contacts["location"] else "Не указано",
+            "location": _contacts["location"] if _contacts["location"] else "-",
             "position": f"_{p}" if (p := sections.get("name")) else "",
         }
         self.sections = sections
+        self.template_lang = template_lang
 
     @staticmethod
     def text_wrapper(_text: str, **kwargs) -> dict:
@@ -44,20 +46,20 @@ class NotionConverter:
 
     def get_general(self) -> list:
         return [
-            self.block_wrapper("heading_2", self.text_wrapper("Личные данные")),
+            self.block_wrapper("heading_2", self.text_wrapper(f"{personal['title'][self.template_lang]}")),
             self.block_wrapper(
                 "paragraph",
-                self.text_wrapper("Дата рождения: ", bold=True),
+                self.text_wrapper(f"{personal['birthday'][self.template_lang]}: ", bold=True),
                 self.text_wrapper(self.personal["birthday"]),
             ),
             self.block_wrapper(
                 "paragraph",
-                self.text_wrapper("Место нахождения: ", bold=True),
+                self.text_wrapper(f"{personal['location'][self.template_lang]}: ", bold=True),
                 self.text_wrapper(self.personal["location"]),
             ),
             self.block_wrapper(
                 "paragraph",
-                self.text_wrapper("Контакты: ", bold=True),
+                self.text_wrapper(f"{personal['contacts'][self.template_lang]}: ", bold=True),
                 self.text_wrapper(self.personal["contacts"]),
             ),
         ]
@@ -88,7 +90,9 @@ class NotionConverter:
             return items
 
         return [
-            self.block_wrapper("paragraph", self.text_wrapper(f"Общий стаж {section['total']}", bold=True)),
+            self.block_wrapper(
+                "paragraph", self.text_wrapper(f"{total[self.template_lang]} {section['total']}", bold=True)
+            ),
             *convert_items(),
         ]
 
@@ -98,9 +102,13 @@ class NotionConverter:
     def convert_driving(self, section: dict) -> list:
         return [
             self.block_wrapper(
-                "paragraph", self.text_wrapper(f"Свой автомобиль: {'Да' if section['own_car'] else 'Нет'}")
+                "paragraph",
+                self.text_wrapper(f"{own_car['has'][self.template_lang]}: {'+' if section['own_car'] else '-'}"),
             ),
-            self.block_wrapper("paragraph", self.text_wrapper(f"Категории: {', '.join(section['categories'])}")),
+            self.block_wrapper(
+                "paragraph",
+                self.text_wrapper(f"{own_car['categories'][self.template_lang]}: {', '.join(section['categories'])}"),
+            ),
         ]
 
     def convert_about(self, section: dict) -> list:
@@ -143,17 +151,23 @@ class NotionConverter:
 
     def convert_citizenship(self, section: dict) -> list:
         return [
-            self.block_wrapper("paragraph", self.text_wrapper(f"Гражданство: {section['citizenship']}")),
-            self.block_wrapper("paragraph", self.text_wrapper(f"Разрешение на работу: {section['permission']}")),
             self.block_wrapper(
-                "paragraph", self.text_wrapper(f"Желательное время в пути до работы: {section['commute']}")
+                "paragraph",
+                self.text_wrapper(f"{citizenship['citizenship'][self.template_lang]}: {section['citizenship']}"),
+            ),
+            self.block_wrapper(
+                "paragraph",
+                self.text_wrapper(f"{citizenship['permission'][self.template_lang]}: {section['permission']}"),
+            ),
+            self.block_wrapper(
+                "paragraph", self.text_wrapper(f"{citizenship['commute'][self.template_lang]}: {section['commute']}")
             ),
         ]
 
     def convert_section(self, attr_name: str, data: dict) -> list:
         try:
             converter = getattr(self, f"convert_{attr_name}")
-            section_title = self.block_wrapper("heading_1", self.text_wrapper(data.pop("title")["ru"]))
+            section_title = self.block_wrapper("heading_1", self.text_wrapper(data.pop("title")[self.template_lang]))
             section_content = converter(data)
             return [section_title, *section_content]
         except AttributeError:
