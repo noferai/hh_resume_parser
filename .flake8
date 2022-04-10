@@ -1,0 +1,15 @@
+[flake8]
+ignore =
+    W503,
+    PD011,
+    I
+exclude =
+    __pycache__
+    .mypy_cache
+    .tox
+    .pyenv-*
+    venv
+max-line-length = 120
+line_length = 120
+per-file-ignores =
+    __init__.py:F401
