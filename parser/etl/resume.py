@@ -6,12 +6,11 @@ import funcy as fc
 from langdetect import DetectorFactory, detect_langs
 
 import parser.models as models
-from parser.converters.docx import get_paragraphs
+from config import logger, LanguageError
 from parser.constants import SECTION_TITLE_MAX, show_more
+from parser.converters.docx import get_paragraphs
 from .fields import FieldsExtractor
 from .notion import NotionConverter
-
-from config import logger, LanguageException
 
 
 def slice_raw(func):
@@ -49,7 +48,7 @@ class ResumeETL:
                 doc_lang = _l.lang
                 break
         if not doc_lang:
-            raise LanguageException
+            raise LanguageError
         return template_lang, doc_lang
 
     def filter_paragraphs(self):

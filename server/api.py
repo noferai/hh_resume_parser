@@ -1,28 +1,27 @@
 import io
 from typing import Optional
 
-import uvicorn
 import httpx
 from fastapi import FastAPI
 from notion_client import AsyncClient
 
-from parser.etl import ResumeETL
 from config import TG_TOKEN, NOTION_TOKEN, NOTION_PAGE_ID
+from parser.etl import ResumeETL
 
 app = FastAPI()
 notion = AsyncClient(auth=NOTION_TOKEN)
 
 
 async def send_tg_message(message: str, chat_id: int):
-    API_URL = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+    api_url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
     async with httpx.AsyncClient() as client:
-        await client.post(API_URL, json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
+        await client.post(api_url, json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"})
 
 
 async def get_file(url: str) -> bytes:
     async with httpx.AsyncClient() as client:
-        r = await client.get(url)
-        return r.content
+        response = await client.get(url)
+        return response.content
 
 
 @app.get("/")
@@ -36,7 +35,3 @@ async def convert(url: Optional[str], chat_id: Optional[int]):
     except Exception as e:
         api_resp = str(e)
     await send_tg_message(api_resp, chat_id)
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)

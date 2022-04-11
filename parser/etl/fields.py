@@ -4,9 +4,9 @@ from typing import Union, Optional
 
 import funcy as fc
 
-from parser.models import Experience, Education, Languages, AdditionalEducation
-from parser.constants import months, genders, years_months, born_on, citizenship, own_car, willing
 from config import logger
+from parser.constants import months, genders, years_months, born_on, citizenship, own_car, willing
+from parser.models import Experience, Education, Languages, AdditionalEducation
 
 
 def join_text(func):
@@ -25,8 +25,8 @@ class FieldsExtractor:
 
     @join_text
     def extract_gender(self, text: str) -> Optional[str]:
-        for g in genders[self.template_lang]:
-            if res := re.search(g, text):
+        for gender in genders[self.template_lang]:
+            if res := re.search(gender, text):
                 return res.group()
         return
 
@@ -121,10 +121,7 @@ class FieldsExtractor:
         return items
 
     def extract_own_car(self, text: list) -> bool:
-        for s in text:
-            if s == own_car["has"][self.template_lang]:
-                return True
-        return False
+        return any(s == own_car["has"][self.template_lang] for s in text)
 
     def extract_driving_categories(self, text: list) -> list:
         categories = []
@@ -132,12 +129,6 @@ class FieldsExtractor:
             if s != own_car["has"][self.template_lang]:
                 categories = [w.replace(",", "") for w in s.split() if len(w) <= 3]
         return categories
-
-    @join_text
-    def extract_degree(self, text: str) -> Optional[str]:
-        if match := re.search(r"\((.*)\)", text):
-            return match.group(1)
-        return text
 
     @staticmethod
     def extract_education_items(text: list) -> list:
@@ -160,8 +151,14 @@ class FieldsExtractor:
         ]
         return items
 
+    @join_text
+    def extract_degree(self, text: str) -> Optional[str]:
+        if match := re.search(r"\((.*)\)", text):
+            return match.group(1)
+        return text
+
     def extract_citizenship(self, text: list) -> dict:
-        result = dict()
+        result = {}
         for p in text:
             _p = fc.str_join(p)
             for k, v in citizenship.items():

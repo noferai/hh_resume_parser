@@ -9,7 +9,6 @@ class NotionConverter:
         sections = copy.deepcopy(sections)
         _general = sections.pop("general")
         _contacts = sections.pop("contacts") if "contacts" in sections else defaultdict(lambda: "")
-        _position = sections.pop("position") if "position" in sections else defaultdict(lambda: "")
         self.personal = {
             "name": _general["name"] if _general["name"] else "-",
             "birthday": _general["birthday"] if _general["birthday"] else "-",

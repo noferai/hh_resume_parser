@@ -1,5 +1,5 @@
-from typing import List, Optional, Union
 from datetime import datetime
+from typing import List, Optional, Union
 
 import funcy as fc
 from pydantic import BaseModel, EmailStr, AnyUrl, Field, validator
@@ -36,15 +36,15 @@ class General(Section):
     age: Optional[int]
 
     @validator("name")
-    def is_alphabetic(cls, v: str):
-        if v:
-            assert not any(c.isdigit() for c in v), "Must be alphabetic"
-        return v
+    def is_alphabetic(cls, value: str):
+        if value:
+            assert not any(c.isdigit() for c in value), "Must be alphabetic"
+        return value
 
     @validator("name", pre=True)
-    def join_str(cls, v):
-        if v:
-            return fc.str_join(v)
+    def join_str(cls, value):
+        if value:
+            return fc.str_join(value)
 
 
 class Contacts(Section):
@@ -63,8 +63,8 @@ class Position(Section):
     updated: datetime
 
     @validator("name", pre=True)
-    def join_str(cls, v):
-        return fc.str_join(v)
+    def join_str(cls, value):
+        return fc.str_join(value)
 
 
 class Experience(Section):
@@ -77,14 +77,14 @@ class Experience(Section):
         other: Union[str, list]
 
         @validator("duration", "total", "company", "company_info", "position", pre=True)
-        def join_str(cls, v):
-            return fc.str_join(v)
+        def join_str(cls, value):
+            return fc.str_join(value)
 
         @validator("other", pre=True)
-        def fix_text(cls, v):
-            if isinstance(v, list):
-                return fix_paragraph(v)
-            return v
+        def fix_text(cls, value):
+            if isinstance(value, list):
+                return fix_paragraph(value)
+            return value
 
     title = Title(ru="Опыт работы", en="Work experience", exact=False)
     min_length = 3
@@ -108,10 +108,10 @@ class About(Section):
     text: Union[str, list]
 
     @validator("text", pre=True)
-    def fix_text(cls, v):
-        if isinstance(v, list):
-            return fix_paragraph(v)
-        return v
+    def fix_text(cls, value):
+        if isinstance(value, list):
+            return fix_paragraph(value)
+        return value
 
 
 class Recommendations(Section):
@@ -119,8 +119,8 @@ class Recommendations(Section):
     items: List[Union[str, list]]
 
     @validator("items", pre=True)
-    def join_str(cls, v):
-        return [fc.str_join(i) for i in v]
+    def join_str(cls, value):
+        return [fc.str_join(i) for i in value]
 
 
 class Portfolio(Section):
@@ -134,8 +134,8 @@ class Education(Section):
         other: Union[str, list, None]
 
         @validator("year", "name", "other", pre=True)
-        def join_str(cls, v):
-            return fc.str_join(v)
+        def join_str(cls, value):
+            return fc.str_join(value)
 
     title = Title(ru="Образование", en="Education", exact=False)
     min_length = 4
@@ -150,8 +150,8 @@ class AdditionalEducation(Section):
         other: Union[str, list, None]
 
         @validator("year", "name", "other", pre=True)
-        def join_str(cls, v):
-            return fc.str_join(v)
+        def join_str(cls, value):
+            return fc.str_join(value)
 
     title = Title(ru="Повышение квалификации, курсы", en="Professional development, courses")
     items: List[Item]

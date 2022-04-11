@@ -1,7 +1,7 @@
 import pytest
 
-from parser.etl import ResumeETL
 from config import TEST_DATA
+from parser.etl import ResumeETL
 
 paths = [str(i) for i in TEST_DATA.rglob("*.docx")]
 
