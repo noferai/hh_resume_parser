@@ -1,12 +1,13 @@
-import logging
+import logging.config
 import os
 import pathlib
 
 import sentry_sdk
 
-logging.basicConfig(format="%(asctime)s %(levelname)-5s %(message)s", level=logging.DEBUG, datefmt="%Y-%m-%d %H:%M:%S")
-
 PROJECT_ROOT = pathlib.Path(__file__).parent
+
+logging.config.fileConfig(fname=PROJECT_ROOT / "logger.ini", disable_existing_loggers=False)
+
 TEST_DATA = PROJECT_ROOT / "tests" / "data"
 TG_TOKEN = os.getenv("TG_TOKEN")
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")

@@ -1,7 +1,10 @@
 import copy
+import logging
 from collections import defaultdict
 
 from parser.constants import personal, total, own_car, citizenship
+
+logger = logging.getLogger(__name__)
 
 
 class NotionConverter:

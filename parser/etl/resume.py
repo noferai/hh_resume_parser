@@ -1,3 +1,4 @@
+import logging
 import re
 import typing
 from collections import defaultdict
@@ -6,11 +7,13 @@ import funcy as fc
 from langdetect import DetectorFactory, detect_langs
 
 import parser.models as models
-from config import logger, LanguageError
+from config import LanguageError
 from parser.constants import SECTION_TITLE_MAX, show_more
 from parser.converters.docx import get_paragraphs
 from .fields import FieldsExtractor
 from .notion import NotionConverter
+
+logger = logging.getLogger(__name__)
 
 
 def slice_raw(func):

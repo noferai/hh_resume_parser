@@ -1,12 +1,14 @@
+import logging
 import re
 from datetime import datetime
 from typing import Union, Optional
 
 import funcy as fc
 
-from config import logger
 from parser.constants import months, genders, years_months, born_on, citizenship, own_car, willing
 from parser.models import Experience, Education, Languages, AdditionalEducation
+
+logger = logging.getLogger(__name__)
 
 
 def join_text(func):
