@@ -36,7 +36,7 @@ class NotionConverter:
         return {
             "object": "block",
             "type": _type,
-            _type: {"text": content},
+            _type: {"rich_text": content},
         }
 
     def get_title(self):

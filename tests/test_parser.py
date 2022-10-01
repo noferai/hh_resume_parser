@@ -12,3 +12,5 @@ def test_parser(file_path):
         etl = ResumeETL(file=f)
         resume = etl.get_resume()
         assert resume
+        notion = etl.to_notion()
+        assert notion

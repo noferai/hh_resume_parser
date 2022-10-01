@@ -60,7 +60,7 @@ class Position(Section):
     min_length = 1
     name: str
     salary: Optional[str]
-    updated: datetime
+    updated: datetime | None
 
     @validator("name", pre=True)
     def join_str(cls, value):
@@ -88,7 +88,7 @@ class Experience(Section):
 
     title = Title(ru="Опыт работы", en="Work experience", exact=False)
     min_length = 3
-    total: str
+    total: str | None
     items: List[Item]
 
 
@@ -110,7 +110,7 @@ class About(Section):
     @validator("text", pre=True)
     def fix_text(cls, value):
         if isinstance(value, list):
-            return fix_paragraph(value)
+            return " ".join(fix_paragraph(value))
         return value
 
 
