@@ -27,7 +27,7 @@ class NotionConverter:
         annotations = {"annotations": kwargs} if kwargs else {}
         return {
             "type": "text",
-            "text": {"content": _text},
+            "text": {"content": _text if _text else ""},
             **annotations,
         }
 
