@@ -149,7 +149,7 @@ class FieldsExtractor:
     @staticmethod
     def extract_languages_items(text: list) -> list:
         items = [
-            Languages.Item(name=lang_i[0], lvl=", ".join(lang_i[1:])) for item in text if (lang_i := item.split(" — "))
+            Languages.Item(name=lang_i[0], lvl=", ".join(lang_i[1:])) for item in text if (lang_i := str(item).split(" — "))
         ]
         return items
 
