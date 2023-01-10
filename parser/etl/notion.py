@@ -181,4 +181,5 @@ class NotionConverter:
         for name, content in self.sections.items():
             if section := self.convert_section(name, content):
                 resume.extend(section)
-        return {"properties": self.get_title(), "children": resume}
+        # TODO: workaround for Notion limits, temporary solution
+        return {"properties": self.get_title(), "children": resume[:100]}
